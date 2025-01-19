@@ -10,6 +10,7 @@ const app = express()
 
 
 const START_SERVER = () => {
+  app.use(express.json())
   app.use('/v1', APIs_V1)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
@@ -23,6 +24,7 @@ const START_SERVER = () => {
 }
 
 // IIFE
+// Try-catch to check the connection of DB
 (async () => {
   try {
     console.log('Connecting to DB')
