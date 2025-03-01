@@ -9,7 +9,7 @@ Router.route('/')
   .get((req, res) => {
     res.status(StatusCodes.OK).json({ message: 'Get the Board' })
   })
-  .post(boardValidation.createNewBoard, boardController.createNew)
+  .post(boardValidation.createNew, boardController.createNew)
 
 Router.route('/:id')
   .get(boardController.getDetails)
