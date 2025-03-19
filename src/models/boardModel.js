@@ -23,6 +23,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const validateBeforeCreate = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
@@ -87,7 +89,25 @@ const pushColumnOrderIds = async (column) => {
       { $push: { columnOrderIds: new ObjectId(String(column._id)) } },
       { returnDocument: 'after' }
     )
-    return result.val
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const update = async (boardId, updateData) => {
+  Object.keys(updateData).forEach(fieldName => {
+    if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+      delete updateData[fieldName]
+    }
+  })
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(boardId)) },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    )
+    return result
   } catch (error) {
     throw new Error(error)
   }
@@ -99,7 +119,8 @@ export const boardModel = {
   createNew,
   findOneById,
   getDetails,
-  pushColumnOrderIds
+  pushColumnOrderIds,
+  update
 }
 
 // boardID: 679481dc1c58d6166b0dd2bb
